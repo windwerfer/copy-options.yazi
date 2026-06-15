@@ -55,14 +55,14 @@ Sources are **never** deleted (even when using cut `x`); this is a copy-oriented
   - `--ignore-existing` → skip
   - `--update` → younger / only if source newer
 - For real transfers: the full command is rebuilt with `ya.quote` on every argument, then `... 2>&1 | tee <log>` is passed to `ya.emit("shell", ...)`.
-- For dry-run: extra `-v --itemize-changes --dry-run` are added, output is captured with `Command():stdout(PIPED):stderr(PIPED)`, merged into a single string, written to the log file (for the `l` key). The result is shown immediately via `ya.confirm { pos = { "center", w = 92, h = 32 }, body = ui.Text(full):wrap(ui.Wrap.YES):align(ui.Align.LEFT) }`. This keeps the experience inside Yazi's native UI (no shell takeover) while left-aligning the preformatted rsync output.
-- Earlier experiments with `pos = { "left", ... }` or over-reliance on confirm for huge outputs had issues; the current balanced approach (popup for quick view + persistent log + `l` → less) works well.
+- For dry-run: extra `-v --itemize-changes --dry-run` are added, output is captured with `Command():stdout(PIPED):stderr(PIPED)`, merged into a single string, written to the log file (for the `l` key). The result is shown immediately via `ya.confirm` (used as an informational "OK" / viewer dialog rather than a true confirmation). `pos = { "center", w = 92, h = 32 }`, body uses `ui.Text(full):wrap(ui.Wrap.YES)`. The whole dialog is centered (no left-docked confirm variant); content is naturally left-aligned.
+- Earlier experiments with `pos = { "left", ... }` failed with "Matching variant not found". We now treat `ya.confirm` purely as a read-only result popup (ignore the boolean return value). The `l` key still offers the full `less` experience.
 - After real (non-dry) rsync shell returns, a `refresh` is emitted.
 
 ### Error / edge handling
 - Empty yank buffer → warn notify and early exit.
 - User cancels any `ya.which` or `ya.input` → silent early return (current behavior).
-- No special handling for rsync failures beyond whatever the shell view (real runs) or the dry-run popup + log shows.
+- No special handling for rsync failures beyond whatever the shell view (real runs) or the dry-run info popup + log shows.
 
 ## Naming & distribution
 

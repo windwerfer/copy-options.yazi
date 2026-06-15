@@ -268,11 +268,13 @@ M.entry = function()
         end
 
         -- Show as a native Yazi popup (stays in the UI, no shell takeover).
-        -- Wide centered dialog + left-aligned preformatted text for rsync itemize output.
+        -- We repurpose ya.confirm as an "OK / info" dialog for viewing results.
+        -- The dialog itself is centered (left-docked pos isn't supported for confirm).
+        -- Content is left-aligned so the rsync --itemize output stays readable.
         ya.confirm {
             pos = { "center", w = 92, h = 32 },
-            title = "Dry-run result (nothing was changed) — close with Enter/Esc",
-            body = ui.Text(full):wrap(ui.Wrap.YES):align(ui.Align.LEFT),
+            title = "Dry-run result — [Enter] / [Esc] to close",
+            body = ui.Text(full):wrap(ui.Wrap.YES),
         }
     else
         -- Real copy / remote: live view is best for progress.
