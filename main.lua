@@ -123,22 +123,35 @@ end
 M.entry = function()
     ya.emit("escape", { visual = true })
 
+    local function view_last_log()
+        ensure_state_dir()
+        -- Use less if available, otherwise cat. Block so user can read and Esc/ q to leave.
+        local viewer = "less -R " .. ya.quote(LOG_FILE) .. " 2>/dev/null || cat " .. ya.quote(LOG_FILE)
+        ya.emit("shell", { viewer, block = true })
+    end
+
     local srcs, target = get_state()
 
     if #srcs == 0 then
-        return ya.notify {
-            title = "copy-options",
-            content = "Nothing yanked yet",
-            level = "warn",
-            timeout = 3,
+        -- Nothing to copy: only offer the log viewer
+        local cands = {
+            { on = "l", desc = "View last rsync log / result" },
         }
+        local choice = ya.which { cands = cands }
+        if not choice then return end
+        local key = cands[choice].on
+        if key == "l" then
+            view_last_log()
+        end
+        return
     end
 
     if not target:match("/$") then target = target .. "/" end
 
     local cands = {
         { on = "p", desc = "Default paste (auto-rename on collision)" },
-        { on = "o", desc = "Override (local rsync)" },
+        { on = "o", desc = "Override (Yazi default paste, like P)" },
+        { on = "O", desc = "Override (local rsync)" },
         { on = "s", desc = "Skip existing (local rsync)" },
         { on = "y", desc = "Override younger (local rsync)" },
         { on = "r", desc = "Remote rsync (last used + history)" },
@@ -153,14 +166,18 @@ M.entry = function()
 
     if key == "p" then
         ya.emit("paste", {})
+        ya.emit("yank", { clear = true })
+        return
+    end
+
+    if key == "o" then
+        ya.emit("paste", { force = true })
+        ya.emit("yank", { clear = true })
         return
     end
 
     if key == "l" then
-        ensure_state_dir()
-        -- Use less if available, otherwise cat. Block so user can read and Esc/ q to leave.
-        local viewer = "less -R " .. ya.quote(LOG_FILE) .. " 2>/dev/null || cat " .. ya.quote(LOG_FILE)
-        ya.emit("shell", { viewer, block = true })
+        view_last_log()
         return
     end
 
@@ -195,7 +212,7 @@ M.entry = function()
     elseif key == "r" then
         need_remote = true
         need_strat_after_remote = true
-    elseif key == "o" then
+    elseif key == "O" then
         strat_flag = nil
     elseif key == "s" then
         strat_flag = "--ignore-existing"
@@ -290,6 +307,14 @@ M.entry = function()
 
         ya.emit("shell", { cmdline, block = true })
         ya.emit("refresh", {})
+        ya.emit("yank", { clear = true })
+
+        ya.notify {
+            title = "copy-options",
+            content = "copy successfully (p+l to display log)",
+            level = "info",
+            timeout = 3,
+        }
     end
 end
 

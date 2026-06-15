@@ -15,7 +15,8 @@ A notification first appears with the **exact target** (your current folder) and
 
 ```
 p = default paste (auto-rename on collision)
-o = override
+o = override (Yazi default/force paste)
+O = override (local rsync)
 s = skip existing
 y = override younger
 r = remote (last + history of 9)
@@ -27,7 +28,8 @@ Then a `ya.which` key popup appears. Press the corresponding key.
 | Key (lower or UPPER) | Meaning                              | What happens |
 |----------------------|--------------------------------------|--------------|
 | `p` / `P`            | Default paste                        | Normal Yazi paste. Auto-renames on collision (file (1), file (2), ...). Fast, integrated. |
-| `o` / `O`            | Override (local)                     | `rsync -aP ... target/` — overwrites existing files. |
+| `o`                  | Override (Yazi default)              | Native Yazi force/overwrite paste (equivalent to uppercase `P`). Fast, integrated. |
+| `O`                  | Override (local rsync)               | `rsync -aP ... target/` — overwrites existing files. |
 | `s` / `S`            | Skip existing (local)                | `rsync -aP --ignore-existing ...` |
 | `y` / `Y`            | Override younger (local)             | `rsync -aP --update ...` (only copy when source is newer) |
 | `r` / `R`            | Remote                               | Pick from last-used remote (history of 9) or enter new (`user@host:/path/`). Then choose o/s/y strategy. Remembers your choices. |
@@ -81,7 +83,7 @@ Example `keymap.toml` (place in your Yazi config dir, usually `~/.config/yazi/ke
 ```toml
 [mgr]
 prepend_keymap = [
-  { on = "p", run = "plugin copy-options", desc = "Smart paste dialog (p=default/rename, o=override, s=skip, y=younger, r=remote, d=dry-run)" },
+  { on = "p", run = "plugin copy-options", desc = "Smart paste dialog (p=default/rename, o=override (Yazi), O=override (rsync), s=skip, y=younger, r=remote, d=dry-run)" },
   { on = "R", run = "plugin copy-options", desc = "Smart paste / rsync collision options dialog" },
 ]
 ```
