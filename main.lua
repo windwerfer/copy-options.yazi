@@ -251,7 +251,7 @@ M.entry = function()
 
     if is_dry then
         -- Capture output (silently) so we can present the full --dry-run result
-        -- via the log viewer (less). This gives scroll + search for long outputs.
+        -- in a native popup. We still write to the log so the "l" key works.
         local args = build_rsync_args(srcs, final_dest, strat_flag, true)
         local output = Command("rsync")
             :arg(args)
@@ -267,11 +267,13 @@ M.entry = function()
             f:write(full); f:close()
         end
 
-        -- Show via the same reliable pager used by the "l" key.
-        -- This avoids ya.confirm pos variant issues and gives the user
-        -- full scrolling/search (less) for potentially long rsync --itemize output.
-        local viewer = "less -R " .. ya.quote(LOG_FILE) .. " 2>/dev/null || cat " .. ya.quote(LOG_FILE)
-        ya.emit("shell", { viewer, block = true })
+        -- Show as a native Yazi popup (stays in the UI, no shell takeover).
+        -- Wide centered dialog + left-aligned preformatted text for rsync itemize output.
+        ya.confirm {
+            pos = { "center", w = 92, h = 32 },
+            title = "Dry-run result (nothing was changed) — close with Enter/Esc",
+            body = ui.Text(full):wrap(ui.Wrap.YES):align(ui.Align.LEFT),
+        }
     else
         -- Real copy / remote: live view is best for progress.
         -- We also tee to the log so you can review later with "l" if needed.

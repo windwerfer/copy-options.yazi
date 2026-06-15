@@ -61,10 +61,10 @@ What this looks like:
 
 Dry-run (`d`) is different:
 - It runs `rsync --dry-run -v --itemize-changes` via `Command` (captured, no visible command while it runs).
-- Output is written to the log file.
-- Then the same `less` viewer used by the `l` key is opened so you get a full scrollable/searchable result (much better for long file lists than a fixed dialog).
+- Output is written to the log file (so the `l` key still gives you `less` with full search/scroll later).
+- The result is shown immediately in a native centered popup (`ya.confirm` + `ui.Text`) that stays inside Yazi's UI. The text is left-aligned to preserve the rsync itemize formatting.
 
-This design gives you excellent visibility for both live progress and detailed dry-run inspection.
+This gives a more consistent UI feel for quick inspection while still providing the powerful `less` fallback via `l` for very long outputs.
 
 The only non-rsync path is `p` = plain default paste (Yazi's native fast path, no extra terminal view needed).
 
