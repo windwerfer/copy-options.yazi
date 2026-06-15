@@ -1,4 +1,4 @@
-# copy-collision.yazi
+# copy-options.yazi
 
 Smart paste dialog powered by rsync for advanced collision handling + remote support.
 
@@ -72,13 +72,13 @@ If you press `p` / `R` with an empty yank buffer you get a clear notification:
 
 ## keymap.toml (created for you)
 
-The file `/opt/download-cache/.config/yazi/keymap.toml` contains:
+Example `keymap.toml` (place in your Yazi config dir, usually `~/.config/yazi/keymap.toml` or `$XDG_CONFIG_HOME/yazi/keymap.toml`):
 
 ```toml
 [mgr]
 prepend_keymap = [
-  { on = "p", run = "plugin copy-collision", desc = "Smart paste dialog (p=default/rename, o=override, s=skip, y=younger, r=remote, d=dry-run)" },
-  { on = "R", run = "plugin copy-collision", desc = "Smart paste / rsync collision options dialog" },
+  { on = "p", run = "plugin copy-options", desc = "Smart paste dialog (p=default/rename, o=override, s=skip, y=younger, r=remote, d=dry-run)" },
+  { on = "R", run = "plugin copy-options", desc = "Smart paste / rsync collision options dialog" },
 ]
 ```
 
@@ -86,12 +86,15 @@ Using `prepend_keymap` means your other default keys stay intact.
 
 ## Files written
 
-- `plugins/copy-collision.yazi/main.lua`
-- `plugins/copy-collision.yazi/README.md` (this file)
-- `keymap.toml` (the bindings)
+- `plugins/copy-options.yazi/main.lua`
+- `plugins/copy-options.yazi/README.md` (this file)
+- `keymap.toml` (the bindings — you add the entries above)
 
-State files (created on first use):
-- `.remote_history` (inside the plugin directory) — plain text, up to 9 recent remotes.
+State / runtime files (created on first use):
+- `~/.local/state/yazi/plugins/copy-options.yazi/.remote_history` (plain text, up to 9 recent remotes)
+- `~/.local/state/yazi/plugins/copy-options.yazi/last_rsync.log` (last rsync output, for the `l` viewer)
+
+These locations respect `XDG_STATE_HOME` when set, and can be overridden with the `COPY_OPTIONS_STATE_DIR` environment variable or via `setup()`. See AGENTS.md for more.
 
 ## Tips
 
