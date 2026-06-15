@@ -55,7 +55,8 @@ Sources are **never** deleted (even when using cut `x`); this is a copy-oriented
   - `--ignore-existing` → skip
   - `--update` → younger / only if source newer
 - For real transfers: the full command is rebuilt with `ya.quote` on every argument, then `... 2>&1 | tee <log>` is passed to `ya.emit("shell", ...)`.
-- For dry-run: extra `-v --itemize-changes --dry-run` are added, output is captured with `Command():stdout(PIPED):stderr(PIPED)`, merged, written to the log file, and displayed in a large `ya.confirm` UI.Text dialog.
+- For dry-run: extra `-v --itemize-changes --dry-run` are added, output is captured with `Command():stdout(PIPED):stderr(PIPED)`, merged into a single string, written to the log file. The result is then shown by spawning `less -R` (or `cat`) on the log file via `ya.emit("shell", { viewer, block = true })`. This gives excellent scroll/search for potentially long `--itemize-changes` output and avoids fragile use of `ya.confirm` for large multi-line bodies.
+- The previous implementation used `ya.confirm { pos = { "left", ... }, body = ui.Text(...):wrap(...) }` which triggered "Matching variant not found" because `"left"` is not a valid position variant for `ya.confirm` (only things like `"center"`, `"top-center"` etc. are supported).
 - After real (non-dry) rsync shell returns, a `refresh` is emitted.
 
 ### Error / edge handling

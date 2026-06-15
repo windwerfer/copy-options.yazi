@@ -250,7 +250,8 @@ M.entry = function()
     ensure_state_dir()
 
     if is_dry then
-        -- Capture output so we can show it persistently in a dialog the user can read and dismiss.
+        -- Capture output (silently) so we can present the full --dry-run result
+        -- via the log viewer (less). This gives scroll + search for long outputs.
         local args = build_rsync_args(srcs, final_dest, strat_flag, true)
         local output = Command("rsync")
             :arg(args)
@@ -266,11 +267,11 @@ M.entry = function()
             f:write(full); f:close()
         end
 
-        ya.confirm {
-            pos = { "left", w = 90, h = 30 },
-            title = "Dry-run result (nothing was changed) — close with Enter/Esc",
-            body = ui.Text(full):wrap(ui.Wrap.YES),
-        }
+        -- Show via the same reliable pager used by the "l" key.
+        -- This avoids ya.confirm pos variant issues and gives the user
+        -- full scrolling/search (less) for potentially long rsync --itemize output.
+        local viewer = "less -R " .. ya.quote(LOG_FILE) .. " 2>/dev/null || cat " .. ya.quote(LOG_FILE)
+        ya.emit("shell", { viewer, block = true })
     else
         -- Real copy / remote: live view is best for progress.
         -- We also tee to the log so you can review later with "l" if needed.

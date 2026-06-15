@@ -48,19 +48,23 @@ Requirements for remote: `rsync` + working ssh (ideally passwordless key auth, a
 
 ## Live rsync output
 
-All rsync paths (local override/skip/younger, remote, dry-run) are executed with:
+Real transfers (local o/s/y, remote) are executed with:
 
 ```bash
-ya.emit("shell", { "rsync -aP ...", block = true })
+ya.emit("shell", { "rsync -aP ... 2>&1 | tee <log>", block = true })
 ```
 
 What this looks like:
 - Yazi opens its shell / command execution view (full-width in the terminal).
 - You see **live** rsync output: progress, current file, transfer stats, ETA, etc. (thanks to `-P`).
 - When rsync finishes (success or error), control returns to Yazi and we refresh the view.
-- For dry-run you see the exact list of files/actions rsync *would* have performed.
 
-This is much more informative than a silent background `Command()` + notify at the end.
+Dry-run (`d`) is different:
+- It runs `rsync --dry-run -v --itemize-changes` via `Command` (captured, no visible command while it runs).
+- Output is written to the log file.
+- Then the same `less` viewer used by the `l` key is opened so you get a full scrollable/searchable result (much better for long file lists than a fixed dialog).
+
+This design gives you excellent visibility for both live progress and detailed dry-run inspection.
 
 The only non-rsync path is `p` = plain default paste (Yazi's native fast path, no extra terminal view needed).
 
