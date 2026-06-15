@@ -150,8 +150,8 @@ M.entry = function()
 
     local cands = {
         { on = "p", desc = "Default paste (auto-rename on collision)" },
-        { on = "o", desc = "Override (Yazi default paste, like P)" },
-        { on = "O", desc = "Override (local rsync)" },
+        { on = "P", desc = "Override (Yazi default paste)" },
+        { on = "o", desc = "Override (local rsync)" },
         { on = "s", desc = "Skip existing (local rsync)" },
         { on = "y", desc = "Override younger (local rsync)" },
         { on = "r", desc = "Remote rsync (last used + history)" },
@@ -170,7 +170,7 @@ M.entry = function()
         return
     end
 
-    if key == "o" then
+    if key == "P" then
         ya.emit("paste", { force = true })
         ya.emit("yank", { clear = true })
         return
@@ -212,7 +212,7 @@ M.entry = function()
     elseif key == "r" then
         need_remote = true
         need_strat_after_remote = true
-    elseif key == "O" then
+    elseif key == "o" then
         strat_flag = nil
     elseif key == "s" then
         strat_flag = "--ignore-existing"
